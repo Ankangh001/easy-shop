@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { View, ScrollView, ActivityIndicator, FlatList } from 'react-native'
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { View, ScrollView, StyleSheet, Text, TextInput } from 'react-native'
+import { Ionicons, Feather, MaterialIcons, Entypo } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import {
     VStack,
@@ -8,7 +8,7 @@ import {
     Button,
     IconButton,
     Icon,
-    Text,
+
     NativeBaseProvider,
     Center,
     Box,
@@ -24,7 +24,7 @@ import CategoryFilter from './CategoryFilter';
 const data = require('../../assets/2.1 products.json');
 const categoriesData = require('../../assets/data/1.1 categories.json');
 
-const ProductContainer = () => {
+const ProductContainer = (props) => {
 
     const [products, setProducts] = useState([]);
     const [productsFiltered, setProductsFiltered] = useState([]);
@@ -84,104 +84,125 @@ const ProductContainer = () => {
     }
 
     return (
-        <NativeBaseProvider>
-            <Center flex={1} style={{marginTop:40}}>
-                <VStack
-                    space={5}
-                    width="100%"
-                    divider={
-                        <Box px="2">
-                            <Divider />
-                        </Box>
-                    }>
-                    <VStack width="100%" space={5} alignItems="center">
-                        <Input
-
-                            onFocus={openList}
-                            onChangeText={(text) => searchProduct(text)}
-                            placeholder="Search"
-                            variant="filled"
-                            bg="#ddd"
-                            borderRadius="10"
-                            py="2"
-                            px="2"
-                            mx="5"
-                            my="5"
-                            placeholderTextColor="gray.500"
-                            _hover={{ bg: 'gray.200', borderWidth: 0 }}
-                            borderWidth="0"
-                            _web={{
-                                _focus: { style: { boxShadow: 'none' } },
-                            }}
-                            InputLeftElement={
-                                <Icon
-                                    ml="2"
-                                    size="5"
-                                    color="gray.500"
-                                    as={<Ionicons name="ios-search" />}
-                                />
-                            }
-
-                            InputRightElement={
-
-                                focus == true ?
-                                    <Icon
-                                        onPress={onBlur}
-                                        mr="3"
-                                        size="6"
-                                        color="gray.500"
-                                        as={<Ionicons name="ios-close" />}
-                                    /> : null
-                            }
-                        />
-                    </VStack>
-                </VStack>
-
+        <View>
+            {/* searchbar */}
+            <View style={styles.searchBar__unclicked}>
+                {/* search Icon */}
+                <Feather
+                    name="search"
+                    size={20}
+                    color="black"
+                    style={{ marginLeft: 1 }}
+                />
+                {/* Input field */}
+                <TextInput
+                    onFocus={openList}
+                    onChangeText={(text) => searchProduct(text)}
+                    style={styles.input}
+                    placeholder="Search"
+                />
+                {/* Cross Button field */}
                 {focus == true ?
-                    (<SearchedProduct productsFiltered={productsFiltered} />)
-                    : (
-                        <View style={{ backgroundColor: 'gainsboro' }}>
+                    <Entypo
+                        name="cross"
+                        size={20}
+                        color="black"
+                        style={{ padding: 1 }}
+                        onPress={onBlur}
+                    /> : null
+                }
 
-                            <ScrollView>
+            </View>
 
-                                <View>
-                                    <Banner />
+{/*  
+    if (i=0) {user is online} user is offline  
+    i=0 ? user is online : user is offline
+*/}
+            {focus == true ?
+                (<SearchedProduct 
+                    productsFiltered={productsFiltered} 
+                    navigation = {props.navigation}
+                />)
+                : (
+                    
+                    <View style={{ backgroundColor: 'gainsboro' }}>
+                        <ScrollView>
+                            {/* banner */}
+                            <View>
+                                <Banner />
+                            </View>
+                            <View>
+                                <CategoryFilter
+                                    categories={categoriesData}
+                                    CategoryFilter={changeCategory}
+                                    productCtg={productCtg}
+                                    active={active}
+                                    setActive={setActive}
+                                />
+                            </View>
+                            {productCtg.length > 0 ? (
+                                <View style={{
+                                    backgroundColor: 'gainsboro',
+                                    flexDirection: 'row',
+                                    flexWrap: 'wrap'
+                                }}>
+                                    {productCtg.map((item) => (
+                                        <ProductList
+                                            navigation = {props.navigation}
+                                            key={item._id.$oid}
+                                            item={item}
+                                        />
+                                    ))}
                                 </View>
-                                <View>
-                                    <CategoryFilter
-                                        categories={categoriesData}
-                                        CategoryFilter={changeCategory}
-                                        productCtg={productCtg}
-                                        active={active}
-                                        setActive={setActive}
-                                    />
-                                </View>
-                                {productCtg.length > 0 ? (
-                                    <View style={{
-                                        backgroundColor: 'gainsboro',
-                                        flexDirection: 'row',
-                                        flexWrap: 'wrap'
-                                    }}>
-                                        {productCtg.map((item) => (
-                                            <ProductList
-                                                key={item._id.$oid}
-                                                item={item}
-                                            />
-                                        ))}
-                                    </View>
-                                ) : <View style={{ alignItems: 'center', justifyContent: 'center', padding:22 }}>
-                                        <Text style={{fontSize:18, color:'#666'}} >No products Found! :) </Text>
-                                    </View>
+                            ) : <View style={{ alignItems: 'center', justifyContent: 'center', padding: 22 }}>
+                                <Text style={{ fontSize: 18, color: '#666' }} >No products Found! :) </Text>
+                            </View>
 
-                                }
+                            }
 
-                            </ScrollView>
-                        </View>
+                        </ScrollView>
+                    </View>
 
-                    )}
-            </Center>
-        </NativeBaseProvider>
+                )}
+
+        </View>
     )
 }
+
+const styles = StyleSheet.create({
+    container: {
+        margin: 15,
+        justifyContent: "flex-start",
+        alignItems: "center",
+        flexDirection: "row",
+        width: "90%",
+
+    },
+    searchBar__unclicked: {
+        padding: 10,
+        flexDirection: "row",
+        width: "95%",
+        backgroundColor: "#ddd",
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: 'center',
+        marginHorizontal: 12,
+        marginVertical: 15
+    },
+    searchBar__clicked: {
+        padding: 10,
+        flexDirection: "row",
+        width: "90%",
+        backgroundColor: "#d9dbda",
+        borderRadius: 15,
+        alignItems: "center",
+        justifyContent: "space-evenly",
+    },
+    input: {
+        fontSize: 14,
+        marginLeft: 10,
+        width: "90%",
+    },
+});
 
 export default ProductContainer

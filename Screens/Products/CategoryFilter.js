@@ -22,21 +22,27 @@ const CategoryFilter = (props) => {
                     ? styles.inactiveView 
                     : styles.activeView}
                 >
-                    <Text style={styles.text}>All</Text>
+                    <Text style={props.active == -1 ? styles.activeText : styles.inActiveText }>All</Text>
                 </View>
             </TouchableOpacity>
 
             {props.categories.map((item) => (
                 
                 <TouchableOpacity
-                    key={item._id.$oid}
+                    key={item._id}
                     onPress={() => {
                         props.CategoryFilter(item._id),
                         props.setActive(props.categories.indexOf(item))
                     }}
                 >
-                    <View style={props.active == props.categories.indexOf(item) ?  styles.activeView : styles.inactiveView }>
-                        <Text style={styles.text}>{item.name}</Text>
+                    <View 
+                        key={item._id}
+                        style={props.active == props.categories.indexOf(item) ? styles.inactiveView   : styles.activeView
+                    }>
+                        <Text 
+                            style={props.active == props.categories.indexOf(item) 
+                            ? styles.activeText : styles.inActiveText }
+                        > {item.name}</Text>
                     </View>
                 </TouchableOpacity>
             ))}
@@ -53,20 +59,23 @@ const styles = StyleSheet.create({
         marginTop: 12
     },
     activeView: {
-        backgroundColor: '#0a95ff50',
         padding: 8,
-        borderRadius: 20,
-        marginRight: 12
+        marginRight: 12,
     },
     inactiveView: {
         backgroundColor: '#0a95ff',
         padding: 8,
-        borderRadius: 20,
+        borderRadius: 50,
         marginRight: 12
     },
-    text: {
+    activeText: {
         color: '#fff',
-        textTransform: 'uppercase'
+        textTransform: 'uppercase',
+        fontSize: 14
+    },
+    inActiveText: {
+        color: '#666',
+        fontSize: 12
     }
 })
 export default CategoryFilter
